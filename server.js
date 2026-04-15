@@ -21,11 +21,26 @@ app.post("/salvar",(req,res)=>{
         lista.push(dados)
 
         fs.writeFile("dados.json",JSON.stringify(lista,null,2),()=>{})
+
     })
 
     res.send("ok")
 })
 
+app.get("/dados",(req,res)=>{
+
+    fs.readFile("dados.json","utf8",(err,conteudo)=>{
+
+        if(!conteudo){
+            return res.json([])
+        }
+
+        res.json(JSON.parse(conteudo))
+
+    })
+
+})
+
 app.listen(3000,()=>{
-    console.log("Servidor rodando")
+    console.log("Servidor rodando em http://localhost:3000")
 })

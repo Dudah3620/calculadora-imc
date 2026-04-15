@@ -1,5 +1,3 @@
-let imcCalculado = 0
-
 function calcularIMC(){
 
     let peso = document.getElementById("peso").value
@@ -7,17 +5,15 @@ function calcularIMC(){
 
     let imc = peso / (altura * altura)
 
-    imcCalculado = imc
-
     let mensagem = ""
 
     if(imc < 18.5){
         mensagem = "Abaixo do peso"
     }
-    else if(imc >= 18.5 && imc < 24.9){
+    else if(imc < 24.9){
         mensagem = "Peso normal"
     }
-    else if(imc >= 24.9 && imc < 29.9){
+    else if(imc < 29.9){
         mensagem = "Sobrepeso"
     }
     else{
@@ -28,12 +24,13 @@ function calcularIMC(){
     "IMC: " + imc.toFixed(2) + " - " + mensagem
 }
 
-function salvarDados(){
+async function salvarDados(){
 
     let peso = document.getElementById("peso").value
     let altura = document.getElementById("altura").value
+    let imc = (peso / (altura * altura)).toFixed(2)
 
-    fetch("/salvar",{
+    await fetch("/salvar",{
         method:"POST",
         headers:{
             "Content-Type":"application/json"
@@ -41,9 +38,33 @@ function salvarDados(){
         body: JSON.stringify({
             peso:peso,
             altura:altura,
-            imc:imcCalculado
+            imc:imc
         })
     })
 
-    alert("Dados salvos!")
+    carregar()
 }
+
+async function carregar(){
+
+    const resposta = await fetch("/dados")
+    const dados = await resposta.json()
+
+    const lista = document.getElementById("lista")
+
+    lista.innerHTML = ""
+
+    dados.forEach(item => {
+
+        const li = document.createElement("li")
+
+        li.textContent =
+        `Peso: ${item.peso} | Altura: ${item.altura} | IMC: ${item.imc}`
+
+        lista.appendChild(li)
+
+    })
+
+}
+
+document.addEventListener("DOMContentLoaded", carregar)
